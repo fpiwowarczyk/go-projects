@@ -19,8 +19,8 @@ var (
 	rows      = 100
 	seed      = time.Now().UnixNano()
 	threshold = 0.06
-	fps       = 1
-	direction = 4
+	fps       = 60
+	direction = 3
 )
 
 func init() {

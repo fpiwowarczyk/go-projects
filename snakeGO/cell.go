@@ -1,8 +1,7 @@
 package main
 
 import (
-	"log"
-	"math/rand"
+	"fmt"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
 )
@@ -28,53 +27,22 @@ type cell struct {
 	y int
 
 	head      bool
-	alive     bool
+	body      bool
 	nextState bool
 }
 
 func (c *cell) checkState(cells [][]*cell) {
-
-	c.alive = c.nextState
-	c.nextState = c.alive
+	c.body = c.nextState
+	c.nextState = c.body
 
 	if c.nextHeadPosition(cells) {
+		fmt.Println(c)
 		c.nextState = true
 		c.head = true
 	} else {
-		c.head = false
 		c.nextState = false
+		c.head = false
 	}
-
-	// switch direction {
-	// case 1:
-
-	// default:
-	// 	continue
-	// }
-
-	// liveCount := c.liveNeighbours(cells)
-	// if c.alive {
-	// 1. Any live cell with fewer than two live neighbours dies, as if caused by underpopulation
-	// if liveCount == 1 {
-	// 	c.nextState = true
-	// }
-
-	// 	// 2. Any live cell with two or three live neighbours lives on to the next generation
-	// 	if liveCount == 2 || liveCount == 3 {
-	// 		c.nextState = true
-	// 	}
-
-	// 	// 3. Any live cell with more than three live neighbours dies, as if by overpopulation
-	// 	if liveCount > 3 {
-	// 		c.nextState = false
-	// 	}
-	// } else {
-	// 	// 4. Any dead cell with exactly three live neighours becomes a live cell, as if by reproduction
-	// 	if liveCount == 3 {
-	// 		c.nextState = true
-	// 	}
-	// }
-	// }
 }
 
 func (c *cell) nextHeadPosition(cells [][]*cell) bool {
@@ -91,27 +59,27 @@ func (c *cell) nextHeadPosition(cells [][]*cell) bool {
 			y = len(cells[x]) - 1
 		}
 
-		if cells[x][y].alive {
+		if cells[x][y].head {
 			liveCount++
 		}
 	}
 
 	switch direction {
 	case 0:
-		check(c.x, c.y-1)
+		check(c.x+1, c.y)
 	case 1:
 		check(c.x-1, c.y)
 	case 2:
 		check(c.x, c.y+1)
 	case 3:
-		check(c.x+1, c.y)
+		check(c.x, c.y-1)
 	}
 
 	return liveCount > 0
 }
 
 func (c *cell) draw() {
-	if !c.alive {
+	if !c.head {
 		return
 	}
 
@@ -153,21 +121,20 @@ func newCell(x, y int) *cell {
 }
 
 func makeCells(seed int64, threshold float64) [][]*cell {
-	log.Printf("Using seed=%v, threshold=%v", seed, threshold)
-	rand.Seed(seed)
 
 	cells := make([][]*cell, rows, columns)
 	for x := 0; x < rows; x++ {
 		for y := 0; y < columns; y++ {
 			c := newCell(x, y)
 
-			c.alive = false
+			c.body = false
 			c.head = false
 			if x == 50 && y == 50 {
-				c.alive = true
 				c.head = true
+				c.body = true
 			}
-			c.nextState = c.alive
+
+			c.nextState = c.head
 
 			cells[x] = append(cells[x], c)
 		}
