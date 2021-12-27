@@ -9,9 +9,9 @@ import (
 // it should use also goroutines
 func main() {
 
-	writeCurrentPath()
+	defer readFilesForDir(0, ".")
 
-	readFilesForDir(0, ".")
+	writeCurrentPath()
 
 }
 
