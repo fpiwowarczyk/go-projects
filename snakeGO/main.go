@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"runtime"
 	"time"
 
@@ -18,7 +19,7 @@ var (
 	columns   = 30
 	rows      = 30
 	seed      = time.Now().UnixNano()
-	fps       = 60
+	fps       = 3
 	direction = 3
 )
 
@@ -39,6 +40,7 @@ func main() {
 	cells := makeCells()
 	t := time.Now()
 	for !window.ShouldClose() {
+		fmt.Print("Tick")
 		tick(cells)
 		if err := draw(program, window, cells); err != nil {
 			panic(err)
@@ -51,9 +53,15 @@ func main() {
 
 func tick(cells [][]*cell) {
 	for x := range cells {
-		for _, c := range cells[x] {
+		for _, cell := range cells[x] {
+			if cell.x > 0 && isBeforeHead(cell.x, cell.y, cells) {
+				cells[cell.x-1][cell.y].head = false
+				cell.head = true
+			} else {
+				cells[29][cell.y].head = true
+				cell.head = true
+			}
 
-			c.checkState(cells)
 		}
 	}
 }

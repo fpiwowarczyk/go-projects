@@ -1,3 +1,3 @@
-# Project based on 
+# SnakeGO It doesnt work, will try to fix in future
 
-https://github.com/KyleBanks/conways-gol/blob/master/cell.go
+Projecy of game snake in Golang

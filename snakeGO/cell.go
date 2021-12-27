@@ -24,65 +24,29 @@ type cell struct {
 	x int
 	y int
 
-	alive         bool
-	nextState     bool
-	foundNextHead bool
+	head bool
+	body bool
+	back bool
 }
 
-func (c *cell) checkState(cells [][]*cell) {
-
-	c.alive = c.nextState
-	c.nextState = c.alive
-
-	if c.nextHeadPosition(cells) && !c.alive {
-		c.nextState = true
-		c.foundNextHead = true
+func (cell *cell) updateState(cells [][]*cell) {
+	if !cell.head && cell.x > 0 {
+		if cells[cell.x-1][cell.y].head {
+		}
 	} else {
-		c.nextState = false
-	}
-
-}
-
-func (c *cell) nextHeadPosition(cells [][]*cell) bool {
-	var liveCount int
-	check := func(x, y int) {
-		if x == len(cells) {
-			x = 0
-		} else if x == -1 {
-			x = len(cells) - 1
-		}
-		if y == len(cells[x]) {
-			y = 0
-		} else if y == -1 {
-			y = len(cells[x]) - 1
-		}
-
-		if cells[x][y].alive {
-			liveCount++
+		if cells[len(cells)-1][cell.y].head {
 		}
 	}
 
-	switch direction {
-	case 0:
-		check(c.x+1, c.y)
-	case 1:
-		check(c.x-1, c.y)
-	case 2:
-		check(c.x, c.y+1)
-	case 3:
-		check(c.x, c.y-1)
-
-	}
-	return liveCount > 0
 }
 
 func (c *cell) draw() {
-	if !c.alive {
+	if !c.head {
 		return
 	}
-
 	gl.BindVertexArray(c.drawable)
 	gl.DrawArrays(gl.TRIANGLES, 0, squarePointsCount)
+
 }
 
 func newCell(x, y int) *cell {
@@ -95,10 +59,10 @@ func newCell(x, y int) *cell {
 		switch i % 3 {
 		case 0:
 			size = 1.0 / float32(columns)
-			factor = float32(x) * (1.0 / float32(columns))
+			factor = float32(x) * size
 		case 1:
 			size = 1.0 / float32(rows)
-			factor = float32(y) * (1.0 / float32(rows))
+			factor = float32(y) * size
 		default:
 			continue
 		}
@@ -113,8 +77,11 @@ func newCell(x, y int) *cell {
 	return &cell{
 		drawable: makeVao(points),
 
-		x: x,
-		y: y,
+		x:    x,
+		y:    y,
+		head: false,
+		body: false,
+		back: false,
 	}
 }
 
@@ -125,11 +92,15 @@ func makeCells() [][]*cell {
 		for y := 0; y < columns; y++ {
 			c := newCell(x, y)
 
-			c.alive = false
-			if x == 20 && y == 20 {
-				c.alive = true
+			if c.x == 10 && c.y == 10 {
+				c.head = true
 			}
-			c.nextState = c.alive
+			if c.x == 9 && c.y == 10 {
+				c.body = true
+			}
+			if c.x == 8 && c.y == 10 {
+				c.back = true
+			}
 
 			cells[x] = append(cells[x], c)
 		}
