@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/go-gl/gl/v4.1-core/gl"
 )
 
@@ -26,23 +24,23 @@ type cell struct {
 	x int
 	y int
 
-	head      bool
-	body      bool
-	nextState bool
+	alive         bool
+	nextState     bool
+	foundNextHead bool
 }
 
 func (c *cell) checkState(cells [][]*cell) {
-	c.body = c.nextState
-	c.nextState = c.body
 
-	if c.nextHeadPosition(cells) {
-		fmt.Println(c)
+	c.alive = c.nextState
+	c.nextState = c.alive
+
+	if c.nextHeadPosition(cells) && !c.alive {
 		c.nextState = true
-		c.head = true
+		c.foundNextHead = true
 	} else {
 		c.nextState = false
-		c.head = false
 	}
+
 }
 
 func (c *cell) nextHeadPosition(cells [][]*cell) bool {
@@ -59,7 +57,7 @@ func (c *cell) nextHeadPosition(cells [][]*cell) bool {
 			y = len(cells[x]) - 1
 		}
 
-		if cells[x][y].head {
+		if cells[x][y].alive {
 			liveCount++
 		}
 	}
@@ -73,13 +71,13 @@ func (c *cell) nextHeadPosition(cells [][]*cell) bool {
 		check(c.x, c.y+1)
 	case 3:
 		check(c.x, c.y-1)
-	}
 
+	}
 	return liveCount > 0
 }
 
 func (c *cell) draw() {
-	if !c.head {
+	if !c.alive {
 		return
 	}
 
@@ -120,21 +118,18 @@ func newCell(x, y int) *cell {
 	}
 }
 
-func makeCells(seed int64, threshold float64) [][]*cell {
+func makeCells() [][]*cell {
 
 	cells := make([][]*cell, rows, columns)
 	for x := 0; x < rows; x++ {
 		for y := 0; y < columns; y++ {
 			c := newCell(x, y)
 
-			c.body = false
-			c.head = false
-			if x == 50 && y == 50 {
-				c.head = true
-				c.body = true
+			c.alive = false
+			if x == 20 && y == 20 {
+				c.alive = true
 			}
-
-			c.nextState = c.head
+			c.nextState = c.alive
 
 			cells[x] = append(cells[x], c)
 		}
