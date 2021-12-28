@@ -49,7 +49,15 @@ func (f *Food) moveToRandomPosition() {
 
 func (f *Food) handleSnakeCollision() {
 	f.moveToRandomPosition()
-	IncreaseScore(5)
+	switch difficulty {
+	case 1:
+		IncreaseScore(5)
+	case 2:
+		IncreaseScore(10)
+	case 3:
+		IncreaseScore(15)
+	}
+
 }
 
 func randInRange(min, max int) int {

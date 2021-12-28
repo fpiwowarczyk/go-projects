@@ -16,6 +16,8 @@ var (
 	border       *Border
 	scoreText    *tl.Text
 	isFullscreen *bool
+	difficulty   int
+	fps          float64
 )
 
 type endgameScreen struct {
@@ -55,7 +57,6 @@ func EndGame() {
 }
 
 func newMainLevel(isFullscreen *bool) tl.Level {
-
 	mainLevel := tl.NewBaseLevel(tl.Cell{
 		Bg: tl.ColorBlack,
 	})
@@ -69,7 +70,7 @@ func newMainLevel(isFullscreen *bool) tl.Level {
 
 	snake := NewSnake()
 	food := NewFood()
-	scoreText = tl.NewText(0, 0, " Score: 0", tl.ColorBlack, tl.ColorBlack)
+	scoreText = tl.NewText(0, 0, " Score: 0", tl.ColorBlack, tl.ColorWhite)
 
 	mainLevel.AddEntity(border)
 	mainLevel.AddEntity(snake)
@@ -78,16 +79,41 @@ func newMainLevel(isFullscreen *bool) tl.Level {
 	return mainLevel
 }
 
-func main() {
-	isFullscreen = flag.Bool("fullscreen", false, "Play fullscreen!")
+func setSimulationSpeed() {
+	switch difficulty {
+	case 1:
+		fps = 10.0
+	case 2:
+		fps = 20.0
+	case 3:
+		fps = 30.0
+	}
+}
 
+func init() {
+	isFullscreen = flag.Bool("fullscreen", false, "Play fullscreen!")
 	flag.Parse()
+}
+
+//Function start main menu
+func main() {
 	rand.Seed(time.Now().UnixNano())
 	game = tl.NewGame()
-
-	mainLevel := newMainLevel(isFullscreen)
-
-	game.Screen().SetLevel(mainLevel)
-	game.Screen().SetFps(30)
+	setSimulationSpeed()
+	menu := NewMenu(isFullscreen)
+	game.Screen().SetLevel(menu)
+	game.Screen().SetFps(fps)
 	game.Start()
+}
+
+func StartGame() {
+	SetDifficulty()
+	mainLevel := newMainLevel(isFullscreen)
+	game.Screen().SetLevel(mainLevel)
+}
+
+func SetDifficulty() {
+	difficulty = selected
+	setSimulationSpeed()
+	game.Screen().SetFps(fps)
 }

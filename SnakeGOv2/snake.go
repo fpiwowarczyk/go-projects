@@ -88,7 +88,7 @@ func (s *Snake) Draw(screen *tl.Screen) {
 	for _, c := range s.body {
 		screen.RenderCell(c.x, c.y, &tl.Cell{
 			Fg: tl.ColorGreen,
-			Ch: 'o',
+			Ch: '0',
 		})
 	}
 }
@@ -146,7 +146,7 @@ func (s *Snake) Collide(collision tl.Physical) {
 }
 
 func (s *Snake) handleFoodCollision() {
-	s.grow(5)
+	s.grow(1)
 }
 
 func (s *Snake) handleBorderCollision() {
